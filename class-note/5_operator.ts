@@ -31,6 +31,12 @@ interface Person {
     age: number,
 }
 
-function askSomeone(someone: Developer | Person){
-    someone.age = 3;
+// function askSomeone(someone: Developer | Person){
+//     someone.age = 3;
+
+// }
+function askSomeone(someone: Developer & Person){
+    someone.name = 'park';
+    someone.skill = 'c';
+    
 }
