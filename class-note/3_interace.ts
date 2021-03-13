@@ -32,4 +32,30 @@ interface StringArray{
 }
 
 var arr2: StringArray = ['a','b','c'];
-arr2[0];
+
+interface StringRegexDictionary{
+    [key: string]: RegExp;
+}
+
+var file: StringRegexDictionary = {
+    cssFile: /\.css$/,
+    jsfile: /\.js$/,
+}
+
+// file['cssFile'] = 'a';
+
+// interace 상속
+interface Person {
+    age: number;
+    name: string;
+}
+
+interface Developer extends Person{
+    language: string;
+}
+
+var capt: Developer = {
+    language: 'hi',
+    age: 100,
+    name: 'captin',
+}
