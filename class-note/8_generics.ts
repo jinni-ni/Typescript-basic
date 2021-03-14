@@ -92,6 +92,7 @@ interface ShoppingItem{
 }
 
 // shoppingitem item 의 type만 사용할 수 있다.
+// 'name', 'price', 'stock' 만 사용가능
 function getShoppingItemOption<T extends keyof ShoppingItem>(itemOption: T): T {
     return itemOption;
 }
