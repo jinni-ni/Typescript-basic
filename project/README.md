@@ -15,8 +15,13 @@
 
 2. 명시적인 `any` 선언하기
     - `typescript.json` 파일에 `noImplicitAny` 값을 `true`로 추가
+    - 가능한한 구체적인 ㅌ아ㅣㅂ으로 타입 정의
 
-    
+3. 프로젝트 환경 구성
+    - babel, eslint, prettier 등의 환경설정
+
+4. 외부 라이브러리 모듈화
+
 ## 참고 자료
 
 - [존스 홉킨스 코로나 현황](https://www.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6)
