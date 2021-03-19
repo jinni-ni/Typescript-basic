@@ -15,8 +15,9 @@ import {
 
 // utils
 // $ : dom을 들고오기 위한 구분자 (= document.querySelector)
-function $(selector: string) {
-    return document.querySelector(selector);
+function $<T extends HTMLElement = HTMLDivElement>(selector: string) {
+    const element = document.querySelector(selector);
+    return element as T;
 }
 function getUnixTimestamp(date: Date | string) {
     return new Date(date).getTime();
@@ -24,13 +25,15 @@ function getUnixTimestamp(date: Date | string) {
 
 let a: Element | HTMLElement | HTMLParagraphElement;
 // DOM
-const confirmedTotal = $('.confirmed-total') as HTMLSpanElement;
-const deathsTotal = $('.deaths') as HTMLParagraphElement;
-const recoveredTotal = $('.recovered') as HTMLParagraphElement;
-const lastUpdatedTime = $('.last-updated-time') as HTMLParagraphElement;
-const rankList = $('.rank-list');
-const deathsList = $('.deaths-list');
-const recoveredList = $('.recovered-list');
+//error
+// HTMLElement 하위 타입만 사용 가능
+// const temp = $<string>('.abc');
+const deathsTotal = $<HTMLParagraphElement>('.deaths');
+const recoveredTotal = $<HTMLParagraphElement>('.recovered');
+const lastUpdatedTime = $<HTMLParagraphElement>('.last-updated-time');
+const rankList = $<HTMLOListElement>('.rank-list');
+const deathsList = $<HTMLOListElement>('.deaths-list');
+const recoveredList = $<HTMLOListElement>('.recovered-list');
 const deathSpinner = createSpinnerElement('deaths-spinner');
 const recoveredSpinner = createSpinnerElement('recovered-spinner');
 
@@ -67,7 +70,7 @@ enum CovidStatus {
 }
 
 function fetchCountryInfo(
-    countryCode: string,
+    countryCode: string | undefined,
     status: CovidStatus
 ): Promise<AxiosResponse<CountrySummaryResponse>> {
     // status params: confirmed, recovered, deaths
@@ -81,18 +84,27 @@ function startApp() {
     initEvents();
 }
 
+// const evt1: Event;
+// const evt2: UIEvent;
+// const ev3: MouseEvent;
+
 // events
 function initEvents() {
+    if (!rankList) {
+        return;
+    }
     rankList.addEventListener('click', handleListClick);
 }
 
-async function handleListClick(event: MouseEvent) {
+async function handleListClick(event: Event) {
     let selectedId;
     if (
         event.target instanceof HTMLParagraphElement ||
         event.target instanceof HTMLSpanElement
     ) {
-        selectedId = event.target.parentElement.id;
+        selectedId = event.target.parentElement
+            ? event.target.parentElement.id
+            : undefined;
     }
     if (event.target instanceof HTMLLIElement) {
         selectedId = event.target.id;
@@ -141,12 +153,15 @@ function setDeathsList(data: CountrySummaryResponse) {
         p.textContent = new Date(value.Date).toLocaleDateString().slice(0, -1);
         li.appendChild(span);
         li.appendChild(p);
-        deathsList.appendChild(li);
+        deathsList!.appendChild(li);
     });
 }
 
 function clearDeathList() {
-    deathsList.innerHTML = null;
+    if (!deathsList) {
+        return;
+    }
+    deathsList.innerHTML = '';
 }
 
 function setTotalDeathsByCountry(data: CountrySummaryResponse) {
@@ -168,12 +183,21 @@ function setRecoveredList(data: CountrySummaryResponse) {
         p.textContent = new Date(value.Date).toLocaleDateString().slice(0, -1);
         li.appendChild(span);
         li.appendChild(p);
-        recoveredList.appendChild(li);
+        // const num = 10;
+        // const a = num === 10 ? true : false;
+
+        // optional chaining operator
+        recoveredList?.appendChild(li);
+        // if (recoveredList === null || recoveredList === undefined) {
+        //     return;
+        // } else {
+        //     recoveredList.appendChild(li);
+        // }
     });
 }
 
 function clearRecoveredList() {
-    recoveredList.innerHTML = null;
+    recoveredList.innerHTML = '';
 }
 
 function setTotalRecoveredByCountry(data: CountrySummaryResponse) {
@@ -200,7 +224,8 @@ async function setupData() {
 }
 
 function renderChart(data: number[], labels: string[]) {
-    const ctx = $('#lineChart').getContext('2d');
+    const lineChart = $('#lineChart') as HTMLCanvasElement;
+    const ctx = lineChart.getContext('2d');
     Chart.defaults.global.defaultFontColor = '#f5eaea';
     Chart.defaults.global.defaultFontFamily = 'Exo 2';
     new Chart(ctx, {
